@@ -96,6 +96,8 @@
   },
   "dependencies": {
     "@nestjs/schedule": "^6.0.0",
-    "@nestjs/swagger": "^11.2.0"
+    "@nestjs/swagger": "^11.2.0",
+    "@sentry/nestjs": "^9.38.0",
+    "@sentry/profiling-node": "^9.38.0"
   }
 }
