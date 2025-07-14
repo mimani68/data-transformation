@@ -1,10 +1,14 @@
-import { NestFactory } from '@nestjs/core';
+import { NestApplicationContext, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  let logLevel = process.env.LOG_LEVEL || 'error'
+  const appConfig: any = {
+    logger: logLevel.split(',')
+  }
+  const app = await NestFactory.create(AppModule, appConfig);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
 

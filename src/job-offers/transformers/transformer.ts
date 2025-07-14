@@ -12,12 +12,12 @@ export class TransformerHandler {
         if (!transformerFunction)
             return { error: true }
         try {
-            let { result, error, missedItem, doneItem, defectedIds } = transformerFunction(data)
+            let { result, error, missedKeys, completeIds, defectedIds } = transformerFunction(data)
             if (error == null) {
-                // this.logger.debug()
+                this.logger.debug({ result, error, missedKeys, completeIds, defectedIds })
                 return { error: false, result }
             } else {
-                return { error, missedItem, doneItem, defectedIds }
+                return { error, missedKeys, completeIds, defectedIds }
             }
         } catch (error) {
             return { error: true }

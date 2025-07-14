@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Unique } from 'typeorm';
 
 import { JobOfferType } from '../enums/job-offer-type.enum';
 
@@ -9,24 +9,28 @@ export class JobOfferEntity {
     @ApiProperty({ description: 'Primary key for the job offer', format: 'number' })
     id: number;
 
-    @Column()
-    @ApiProperty({ description: 'Job title' })
+    @Column({ type: 'varchar' })
+    @ApiProperty({ description: 'Job title', nullable: false })
     title: string;
 
-    @Column({ nullable: true })
-    @ApiProperty({ description: 'Job description', required: false })
+    @Column({ type: 'varchar', nullable: true })
+    @ApiProperty({ description: 'Job description' })
+    experience: string
+
+    @Column({ type: 'varchar', nullable: true })
+    @ApiProperty({ type: 'string', description: 'Job description', required: false })
     description?: string;
 
-    @Column()
-    @ApiProperty({ description: 'Company name' })
+    @Column({ type: 'varchar' })
+    @ApiProperty({ type: 'string', description: 'Company name' })
     companyName: string;
 
-    @Column()
-    @ApiProperty({ description: 'Industry' })
+    @Column({ type: 'varchar' })
+    @ApiProperty({ type: 'string', description: 'Industry' })
     industry: string;
 
-    @Column()
-    @ApiProperty({ description: 'Location' })
+    @Column({ type: 'varchar' })
+    @ApiProperty({ type: 'string', description: 'Location' })
     location: string;
 
     @Column({ type: 'enum', enum: JobOfferType })

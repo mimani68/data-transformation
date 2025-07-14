@@ -43,7 +43,7 @@ export class JobOffersCronjob {
       let providers = [PROVIDER_ONE, PROVIDER_TWO]
       for (let p of providers) {
         const response = await this.fetchDataFromApi(p.url)
-        const {result, error, missedItem, doneItem} = this.transformer.transform(response, p.transformerFunction)
+        const {result, error, missedKeys, completeIds} = this.transformer.transform(response, p.transformerFunction)
         if (!error) {
           // await this.jobOffersService.saveJobOffers([...transformedData.result]);
           console.log(JSON.stringify(result))
