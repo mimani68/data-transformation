@@ -2,13 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import axios from 'axios';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
-import { JobOfferEntity } from '../entities/job-offer';
 import { TransformerHandler } from '../transformers/transformer';
-import { PROVIDER_ONE, PROVIDER_TWO } from '../constants/provider.const';
+import { PROVIDER_ONE, PROVIDER_TWO } from '../providers';
 import { JobOffersService } from '../services/job-offers.service';
+
+let CRON = process.env.JOB_RETRIEVAL_CRON_STRING || CronExpression.EVERY_30_SECONDS
 
 @Injectable()
 export class JobOffersCronjob {
@@ -16,11 +15,13 @@ export class JobOffersCronjob {
 
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(JobOfferEntity)
-    private readonly jobOfferRepository: Repository<JobOfferEntity>,
     private readonly jobOffersService: JobOffersService,
     private readonly transformer: TransformerHandler
-  ) { }
+  ) {
+    if (this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING')) {
+      CRON = this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING')
+    }
+  }
 
   private async fetchDataFromApi(apiUrl: string): Promise<any> {
     try {
@@ -35,26 +36,24 @@ export class JobOffersCronjob {
     }
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CRON)
   async handleCron() {
     this.logger.log('Starting cron job to fetch and save job offers...');
     try {
-      const apiUrl1 = this.configService.get<string>('API_1_URL');
-      const api1Data = await this.fetchDataFromApi(apiUrl1)
-      const transformedDataApi1 = this.transformer.transform(api1Data, PROVIDER_ONE)
-      if (!transformedDataApi1.error) {
-        await this.jobOffersService.saveJobOffers([...transformedDataApi1.result]);
-        this.logger.log('Cron job completed successfully.');
-      }
+      let providers = [PROVIDER_ONE, PROVIDER_TWO]
+      for (let p of providers) {
+        const response = await this.fetchDataFromApi(p.url)
+        let { result, error, missedKeys, completeIds, defectedIds } = this.transformer.transform(response, p.transformerFunction)
+        this.logger.debug({ id: p.providerId, url: p.url, result, error, missedKeys, completeIds, defectedIds })
+        result.forEach(element => {
+          element.provider = p.providerId
+        });
 
-      const apiUrl2 = this.configService.get<string>('API_2_URL');
-      const api2Data = await this.fetchDataFromApi(apiUrl2)
-      const transformedDataApi2 = this.transformer.transform(api2Data, PROVIDER_TWO)
-      if (!transformedDataApi2.error) {
-        await this.jobOffersService.saveJobOffers([...transformedDataApi2.result]);
-        this.logger.log('Cron job completed successfully.');
+        if (!error) {
+          await this.jobOffersService.saveJobOffers([...result]);
+        }
       }
-
+      this.logger.log('Cron job completed successfully.');
     } catch (error) {
       this.logger.error(`Cron job failed: ${error.message}`);
     }
