@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Like, Repository } from 'typeorm';
 
 import { JobOfferEntity } from '../entities/job-offer';
+import { JobOfferRepository } from '../repositories/job-offer.repository';
 
 @Injectable()
 export class JobOffersService {
@@ -10,7 +11,7 @@ export class JobOffersService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly jobOfferRepository: Repository<JobOfferEntity>,
+    private readonly jobOfferRepository: JobOfferRepository
   ) { }
 
   async saveJobOffers(jobOffers: JobOfferEntity[]): Promise<void> {
@@ -60,7 +61,7 @@ export class JobOffersService {
       whereConditions.salaryRange = { max: maxSalary };
     }
 
-    const [data, total] = await this.jobOfferRepository.findAndCount({
+    const {data, total} = await this.jobOfferRepository.findAndCount({
       where: whereConditions,
       skip,
       take: limit,

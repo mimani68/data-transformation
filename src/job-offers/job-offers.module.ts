@@ -7,10 +7,11 @@ import { JobOffersService } from './services/job-offers.service';
 import { JobOfferEntity } from './entities/job-offer';
 import { JobOffersCronjob } from './cronjob/job-offers.cron';
 import { TransformerHandler } from './transformers/transformer';
+import { JobOfferRepository } from './repositories/job-offer.repository';
 
 @Module({
     imports: [TypeOrmModule.forFeature([JobOfferEntity]), ScheduleModule.forRoot()],
     controllers: [JobOffersController],
-    providers: [JobOffersService, JobOffersCronjob, TransformerHandler],
+    providers: [JobOffersService, JobOffersCronjob, TransformerHandler, JobOfferRepository],
 })
 export class JobOffersModule { }
