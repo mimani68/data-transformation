@@ -1,4 +1,4 @@
-# Job Offers API Documentation
+# Job Offers service
 
 Welcome to the Job Offers API! This documentation provides an overview of the available endpoints, configurations, and setup details.
 
@@ -63,9 +63,23 @@ Returns an object containing:
 - Use `docker-compose.yml` to set up PostgreSQL and Redis services locally
 - Ensure environment variables match your setup
 
+```shell
+npm run start
+```
+
 ## Error Handling
 
 - Custom exceptions like `HttpInvalidMethodException` may be thrown for invalid API requests
 - Database errors such as unique violations are caught and translated into HTTP 400 responses
 
 For further details, consult the respective source files in the `src` directory or visit [localhost:3000/doc](http://localhost:3000/doc) for generated API documentation if available.
+
+## Automatic Testing
+
+For automated testing for predefine service following command would be best choice.
+
+```shell
+npm run test
+```
+
+![](./docs/unit-test.png)
