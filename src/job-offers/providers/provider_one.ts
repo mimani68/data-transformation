@@ -21,7 +21,7 @@ export const PROVIDER_ONE = {
                     industry: job?.company?.industry || '-N/A-',
                     location: job?.details?.location || '-N/A-',
                     type: job?.details?.type ? TransformerHandler.mapJobType(job?.details?.type) : '-N/A-',
-                    salaryRange: job?.details?.salaryRange ? TransformerHandler.parseSalaryRange(job?.details?.salaryRange) : '-N/A-',
+                    salaryRange: job?.details?.salaryRange ? TransformerHandler.parseSalary(job?.details?.salaryRange) : '-N/A-',
                     skills: job?.skills || '-N/A-',
                     postedDate: job?.postedDate ? new Date(job?.postedDate) : '-N/A-'
                 }

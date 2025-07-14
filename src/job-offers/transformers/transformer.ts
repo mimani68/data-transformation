@@ -39,15 +39,32 @@ export class TransformerHandler {
         }
     }
 
-    static parseSalaryRange(range: string): { min: number; max: number; currency: string } | undefined {
-        if (!range) return undefined;
-        const regex = /([$€£])(\d+)-(\d+)/;
-        const match = range.match(regex);
-        if (!match) return undefined;
-        const currency = match[1];
-        const min = parseInt(match[2], 10);
-        const max = parseInt(match[3], 10);
-        return { min, max, currency };
+    static parseSalary(range: string): { min: number; max: number; currency: string } | undefined {
+        const parts = range.split(/\s*-\s*/);
+
+        let min = null;
+        let max = null;
+        const currency = "USD";
+
+        if (parts[0]) {
+            const minMatch = parts[0].match(/\$(\d+(?:,\d{3})*(?:\.\d+)?)k?/i);
+            if (minMatch) {
+                min = parseFloat(minMatch[1].replace(/,/g, '')) * 1000;
+            }
+        }
+
+        if (parts[1]) {
+            const maxMatch = parts[1].match(/\$(\d+(?:,\d{3})*(?:\.\d+)?)k?/i);
+            if (maxMatch) {
+                max = parseFloat(maxMatch[1].replace(/,/g, '')) * 1000;
+            }
+        }
+        else if (min !== null) {
+            max = min;
+        }
+
+        return { min: min, max: max, currency: currency };
     }
+
 
 }
