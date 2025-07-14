@@ -75,6 +75,8 @@ export class JobOffersService {
     maxSalary?: number,
     page: number = 1,
     limit: number = 10,
+    sortBy?: string,
+    sortDirection: 'ASC' | 'DESC' = 'DESC',
   ): Promise<{ data: JobOfferEntity[]; total: number; page: number; limit: number }> {
     // Validate input parameters
     if (page < 1) {
@@ -87,28 +89,49 @@ export class JobOffersService {
       throw new HttpBadRequestException('Minimum salary cannot be greater than maximum salary');
     }
 
+    // Validate sort parameters
+    const validSortFields = ['title', 'companyName', 'location', 'postedDate', 'salaryRange.min', 'salaryRange.max'];
+    if (sortBy && !validSortFields.includes(sortBy)) {
+      throw new HttpBadRequestException(`Invalid sort field. Must be one of: ${validSortFields.join(', ')}`);
+    }
+
     const skip = (page - 1) * limit;
     const whereConditions: any = {};
 
-    try {
-      if (title) {
-        whereConditions.title = Like(`%${title}%`);
-      }
-      if (location) {
-        whereConditions.location = Like(`%${location}%`);
-      }
-      if (minSalary) {
-        whereConditions.salaryRange = { min: minSalary };
-      }
-      if (maxSalary) {
-        whereConditions.salaryRange = { max: maxSalary };
-      }
+    if (title) {
+      whereConditions.title = Like(`%${title}%`);
+    }
+    if (location) {
+      whereConditions.location = Like(`%${location}%`);
+    }
+    if (minSalary) {
+      whereConditions.salaryRange = { min: minSalary };
+    }
+    if (maxSalary) {
+      whereConditions.salaryRange = { max: maxSalary };
+    }
 
-      const { data, total } = await this.jobOfferRepository.findAndCount({
+    // Handle sorting
+    let order = {};
+    if (sortBy) {
+      if (sortBy.includes('salaryRange.')) {
+        // Handle nested salaryRange sorting
+        const [parent, field] = sortBy.split('.');
+        order = { [parent]: { [field]: sortDirection } };
+      } else {
+        order = { [sortBy]: sortDirection };
+      }
+    } else {
+      // Default sorting
+      order = { postedDate: sortDirection };
+    }
+
+    try {
+      const {data, total} = await this.jobOfferRepository.findAndCount({
         where: whereConditions,
         skip,
         take: limit,
-        order: { postedDate: 'DESC' },
+        order,
       });
 
       return {
@@ -120,9 +143,11 @@ export class JobOffersService {
     } catch (error) {
       this.logger.error(`Failed to retrieve job offers: ${error.message}`);
       if (error instanceof QueryFailedError) {
-        // Handle specific PostgreSQL query errors
         if (error.message.includes('invalid input syntax')) {
           throw new HttpBadRequestException('Invalid search parameters');
+        }
+        if (error.message.includes('column "') && error.message.includes(' does not exist')) {
+          throw new HttpBadRequestException('Invalid sort field');
         }
       }
       throw new HttpInternalException('Failed to retrieve job offers');
