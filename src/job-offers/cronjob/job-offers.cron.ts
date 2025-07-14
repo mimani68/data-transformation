@@ -43,13 +43,13 @@ export class JobOffersCronjob {
       let providers = [PROVIDER_ONE, PROVIDER_TWO]
       for (let p of providers) {
         const response = await this.fetchDataFromApi(p.url)
-        const {result, error, missedKeys, completeIds} = this.transformer.transform(response, p.transformerFunction)
+        let {result, error, missedKeys, completeIds, defectedIds } = this.transformer.transform(response, p.transformerFunction)
+        this.logger.debug({ id: p.providerId, url: p.url, result, error, missedKeys, completeIds, defectedIds })
         if (!error) {
-          // await this.jobOffersService.saveJobOffers([...transformedData.result]);
-          console.log(JSON.stringify(result))
-          this.logger.log('Cron job completed successfully.');
+          await this.jobOffersService.saveJobOffers([...result]);
         }
       }
+      this.logger.log('Cron job completed successfully.');
     } catch (error) {
       this.logger.error(`Cron job failed: ${error.message}`);
     }

@@ -3,11 +3,17 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 
 import { JobOfferType } from '../enums/job-offer-type.enum';
 
-@Entity()
+@Entity({
+    name: 'jobOffers'
+})
 export class JobOfferEntity {
     @PrimaryGeneratedColumn()
     @ApiProperty({ description: 'Primary key for the job offer', format: 'number' })
     id: number;
+
+    @Column({ type: 'varchar' })
+    @ApiProperty({ description: 'External ID', nullable: false })
+    externalId: string;
 
     @Column({ type: 'varchar' })
     @ApiProperty({ description: 'Job title', nullable: false })

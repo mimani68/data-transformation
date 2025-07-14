@@ -13,7 +13,7 @@ export const PROVIDER_ONE = {
 
             jobs.forEach(job => {
                 let tmp = {
-                    id: job?.jobId || '-N/A-',
+                    externalId: job?.jobId || '-N/A-',
                     title: job?.title || '-N/A-',
                     experience: '',
                     companyName: job?.company?.name || '-N/A-',
@@ -25,17 +25,17 @@ export const PROVIDER_ONE = {
                     skills: job?.skills || '-N/A-',
                     postedDate: job?.postedDate ? new Date(job?.postedDate) : '-N/A-'
                 }
-                completeIds.add(tmp?.id)
+                completeIds.add(tmp?.externalId)
                 result.add(tmp)
                 for (let index in tmp) {
                     if (tmp[index] === '-N/A-') {
                         missedKeys.add(index)
-                        defectedIds.add(tmp?.id)
-                        completeIds.delete(tmp?.id)
+                        defectedIds.add(tmp?.externalId)
+                        completeIds.delete(tmp?.externalId)
                     }
                 }
             });
-            return { result, error: null, missedKeys, completeIds, defectedIds }
+            return { result: [...result], error: null, missedKeys, completeIds, defectedIds }
         } catch (error) {
             return { result: null, error, missedKeys: null, doneItem: null }
         }

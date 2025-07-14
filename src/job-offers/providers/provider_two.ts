@@ -14,7 +14,7 @@ export const PROVIDER_TWO = {
 
             for (let index in jobs) {
                 let tmp = {
-                    id: index || '-N/A-',
+                    externalId: index || '-N/A-',
                     title: jobs[index]?.position || '-N/A-',
                     experience: jobs[index]?.requirements?.experience || '-N/A-',
                     industry: '',
@@ -28,21 +28,19 @@ export const PROVIDER_TWO = {
                         currency: jobs[index]?.compensation?.currency || '-N/A-',
                     },
                     skills: jobs[index]?.requirements?.technologies || '-N/A-',
-                    postedDate: new Date(jobs[index]?.datePosted),
-                    createdAt: new Date(jobs[index]?.createdAt),
-                    updatedAt: new Date(jobs[index]?.updatedAt)
+                    postedDate: new Date(jobs[index]?.datePosted)
                 }
                 result.add(tmp)
-                completeIds.add(tmp?.id)
+                completeIds.add(tmp?.externalId)
                 for (let key in tmp) {
                     if (tmp[key] === '-N/A-') {
                         missedKeys.add(key)
-                        defectedIds.add(tmp?.id)
-                        completeIds.delete(tmp?.id)
+                        defectedIds.add(tmp?.externalId)
+                        completeIds.delete(tmp?.externalId)
                     }
                 }
             }
-            return { result: result.values(), error: null, missedKeys, completeIds, defectedIds }
+            return { result: [...result], error: null, missedKeys, completeIds, defectedIds }
         } catch (error) {
             return { result: null, error, missedKeys: null, completeIds: null, defectedIds: null }
         }

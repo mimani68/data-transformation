@@ -14,8 +14,7 @@ export class TransformerHandler {
         try {
             let { result, error, missedKeys, completeIds, defectedIds } = transformerFunction(data)
             if (error == null) {
-                this.logger.debug({ result, error, missedKeys, completeIds, defectedIds })
-                return { error: false, result }
+                return { error: false, result, missedKeys, completeIds, defectedIds }
             } else {
                 return { error, missedKeys, completeIds, defectedIds }
             }
