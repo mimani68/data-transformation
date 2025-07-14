@@ -78,7 +78,6 @@ export class JobOffersService {
     sortBy?: string,
     sortDirection: 'ASC' | 'DESC' = 'DESC',
   ): Promise<{ data: JobOfferEntity[]; total: number; page: number; limit: number }> {
-    // Validate input parameters
     if (page < 1) {
       throw new HttpBadRequestException('Page number must be at least 1');
     }
@@ -89,7 +88,6 @@ export class JobOffersService {
       throw new HttpBadRequestException('Minimum salary cannot be greater than maximum salary');
     }
 
-    // Validate sort parameters
     const validSortFields = ['title', 'companyName', 'location', 'postedDate', 'salaryRange.min', 'salaryRange.max'];
     if (sortBy && !validSortFields.includes(sortBy)) {
       throw new HttpBadRequestException(`Invalid sort field. Must be one of: ${validSortFields.join(', ')}`);
@@ -111,18 +109,15 @@ export class JobOffersService {
       whereConditions.salaryRange = { max: maxSalary };
     }
 
-    // Handle sorting
     let order = {};
     if (sortBy) {
       if (sortBy.includes('salaryRange.')) {
-        // Handle nested salaryRange sorting
         const [parent, field] = sortBy.split('.');
         order = { [parent]: { [field]: sortDirection } };
       } else {
         order = { [sortBy]: sortDirection };
       }
     } else {
-      // Default sorting
       order = { postedDate: sortDirection };
     }
 
