@@ -2,13 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import axios from 'axios';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
-import { JobOfferEntity } from '../entities/job-offer';
 import { TransformerHandler } from '../transformers/transformer';
 import { PROVIDER_ONE, PROVIDER_TWO } from '../providers';
 import { JobOffersService } from '../services/job-offers.service';
+
+let CRON = process.env.JOB_RETRIEVAL_CRON_STRING || CronExpression.EVERY_30_SECONDS
 
 @Injectable()
 export class JobOffersCronjob {
@@ -16,11 +15,13 @@ export class JobOffersCronjob {
 
   constructor(
     private readonly configService: ConfigService,
-    @InjectRepository(JobOfferEntity)
-    private readonly jobOfferRepository: Repository<JobOfferEntity>,
     private readonly jobOffersService: JobOffersService,
     private readonly transformer: TransformerHandler
-  ) { }
+  ) {
+    if ( this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING') ) {
+      CRON = this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING')
+    }
+  }
 
   private async fetchDataFromApi(apiUrl: string): Promise<any> {
     try {
@@ -35,8 +36,7 @@ export class JobOffersCronjob {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  // @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CRON)
   async handleCron() {
     this.logger.log('Starting cron job to fetch and save job offers...');
     try {
