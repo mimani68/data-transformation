@@ -28,7 +28,7 @@ The application uses a `.env-sample` file for environment variables:
 ![](./docs/swagger.png)
 ### Get Job Offers
 
-- **URL**: `/job-offers` (GET)
+- **URL**: `/api/job-offers` (GET)
 - **Description**: Fetches a list of job offers with optional filtering, pagination, and sorting
 
 #### Query Parameters
