@@ -18,7 +18,7 @@ export class JobOffersCronjob {
     private readonly jobOffersService: JobOffersService,
     private readonly transformer: TransformerHandler
   ) {
-    if ( this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING') ) {
+    if (this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING')) {
       CRON = this.configService.get<string>('JOB_RETRIEVAL_CRON_STRING')
     }
   }
@@ -43,8 +43,12 @@ export class JobOffersCronjob {
       let providers = [PROVIDER_ONE, PROVIDER_TWO]
       for (let p of providers) {
         const response = await this.fetchDataFromApi(p.url)
-        let {result, error, missedKeys, completeIds, defectedIds } = this.transformer.transform(response, p.transformerFunction)
+        let { result, error, missedKeys, completeIds, defectedIds } = this.transformer.transform(response, p.transformerFunction)
         this.logger.debug({ id: p.providerId, url: p.url, result, error, missedKeys, completeIds, defectedIds })
+        result.forEach(element => {
+          element.provider = p.providerId
+        });
+
         if (!error) {
           await this.jobOffersService.saveJobOffers([...result]);
         }

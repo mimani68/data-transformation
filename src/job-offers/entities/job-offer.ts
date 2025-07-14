@@ -24,6 +24,10 @@ export class JobOfferEntity {
     experience: string
 
     @Column({ type: 'varchar', nullable: true })
+    @ApiProperty({ description: 'Provider id' })
+    provider: string
+
+    @Column({ type: 'varchar', nullable: true })
     @ApiProperty({ type: 'string', description: 'Job description', required: false })
     description?: string;
 

@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOneOptions, FindManyOptions } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base.repository';
 import { JobOfferEntity } from 'src/job-offers/entities/job-offer';
 
@@ -11,11 +11,13 @@ export class JobOfferRepository extends BaseRepository<JobOfferEntity> {
     super(jobOfferRepository);
   }
 
-  async findOne(where: any): Promise<JobOfferEntity> {
-    return null
+  async findOne(where: FindOneOptions<JobOfferEntity>): Promise<JobOfferEntity> {
+    return this.jobOfferRepository.findOne(where);
   }
 
-  async findAndCount(query: any): Promise<{total: number, data: JobOfferEntity[]}> {
-    return null
+  async findAndCount(options?: FindManyOptions<JobOfferEntity>): 
+    Promise<{ total: number; data: JobOfferEntity[] }> {
+    const [data, total] = await this.jobOfferRepository.findAndCount(options);
+    return { total, data };
   }
 }
