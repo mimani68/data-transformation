@@ -5,6 +5,7 @@ import { JobOfferType } from '../enums/job-offer-type.enum';
 
 @Entity()
 export class JobOfferEntity {
+    @PrimaryGeneratedColumn()
     @ApiProperty({ description: 'Primary key for the job offer', format: 'number' })
     id: number;
 
