@@ -1,3 +1,5 @@
+import "./instrument";
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -9,8 +11,7 @@ async function bootstrap() {
     logger: logLevel.split(',')
   }
   const app = await NestFactory.create(AppModule, appConfig);
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT') || 3000;
+  app.setGlobalPrefix('api');
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Job Offers API')
@@ -20,6 +21,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('doc', app, document);
 
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT') || 3000;
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
