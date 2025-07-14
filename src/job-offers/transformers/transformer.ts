@@ -66,5 +66,4 @@ export class TransformerHandler {
         return { min: min, max: max, currency: currency };
     }
 
-
 }
